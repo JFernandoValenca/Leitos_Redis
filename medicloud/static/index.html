@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MediCloud — Dashboard Hospitalar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #f7fafc;
+  --border: #e2e8f0;
+  --border-light: #edf2f7;
+  --primary: #1a6cf6;
+  --primary-dark: #1558d6;
+  --primary-light: #dbeafe;
+  --primary-glow: rgba(26,108,246,0.15);
+  --text: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --green: #10b981;
+  --green-bg: #d1fae5;
+  --red: #ef4444;
+  --red-bg: #fee2e2;
+  --yellow: #f59e0b;
+  --yellow-bg: #fef3c7;
+  --purple: #8b5cf6;
+  --purple-bg: #ede9fe;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 32px;
+  gap: 0;
+}
+.navbar-brand {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; margin-right: 40px;
+}
+.brand-icon {
+  width: 36px; height: 36px; background: var(--primary);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+}
+.brand-icon i { color: white; font-size: 16px; }
+.brand-name { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+.brand-name span { color: var(--primary); }
+.nav-links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; transition: all var(--transition); text-decoration: none;
+  border: none; background: none;
+}
+.nav-link:hover { background: var(--surface2); color: var(--text); }
+.nav-link.active { background: var(--primary-light); color: var(--primary); }
+.nav-link i { font-size: 14px; }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.nav-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; background: var(--green-bg);
+  border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--green);
+}
+.nav-badge .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+.nav-time { font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; font-family: var(--mono); }
+
+/* ===== LAYOUT ===== */
+.layout { display: flex; padding-top: 64px; min-height: 100vh; }
+.sidebar {
+  width: 240px; position: fixed; top: 64px; bottom: 0; left: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 20px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;
+}
+.sidebar-section { margin-top: 16px; margin-bottom: 4px; padding: 0 8px; }
+.sidebar-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  font-size: 13.5px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; transition: all var(--transition);
+  border: none; background: none; width: 100%; text-align: left;
+}
+.sidebar-link:hover { background: var(--surface2); color: var(--text); }
+.sidebar-link.active { background: var(--primary-light); color: var(--primary); }
+.sidebar-link i { width: 18px; text-align: center; font-size: 14px; }
+.sidebar-count {
+  margin-left: auto; font-size: 11px; font-weight: 600;
+  background: var(--border); color: var(--text-2);
+  padding: 2px 7px; border-radius: 10px;
+}
+.sidebar-count.red { background: var(--red-bg); color: var(--red); }
+.sidebar-count.green { background: var(--green-bg); color: var(--green); }
+.main { margin-left: 240px; flex: 1; padding: 32px; min-height: calc(100vh - 64px); }
+
+/* ===== PAGE HEADER ===== */
+.page-header { margin-bottom: 28px; }
+.page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.page-subtitle { font-size: 14px; color: var(--text-3); margin-top: 4px; }
+
+/* ===== STATS GRID ===== */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--surface); border-radius: var(--radius); padding: 20px 22px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.stat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+.stat-icon.green { background: var(--green-bg); color: var(--green); }
+.stat-icon.red { background: var(--red-bg); color: var(--red); }
+.stat-icon.yellow { background: var(--yellow-bg); color: var(--yellow); }
+.stat-icon.purple { background: var(--purple-bg); color: var(--purple); }
+.stat-trend { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+.stat-trend.up { background: var(--green-bg); color: var(--green); }
+.stat-trend.down { background: var(--red-bg); color: var(--red); }
+.stat-value { font-size: 32px; font-weight: 700; letter-spacing: -1px; color: var(--text); line-height: 1; }
+.stat-label { font-size: 13px; color: var(--text-3); margin-top: 4px; font-weight: 500; }
+.stat-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 14px; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.stat-bar-fill.blue { background: var(--primary); }
+.stat-bar-fill.green { background: var(--green); }
+.stat-bar-fill.red { background: var(--red); }
+.stat-bar-fill.yellow { background: var(--yellow); }
+
+/* ===== TOOLBAR ===== */
+.toolbar {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.toolbar-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px; flex: 1; min-width: 200px;
+}
+.toolbar-search i { color: var(--text-3); font-size: 14px; }
+.toolbar-search input {
+  border: none; background: transparent; outline: none;
+  font-family: var(--font); font-size: 14px; color: var(--text); width: 100%;
+}
+.filter-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.filter-btn {
+  padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text-2);
+  cursor: pointer; transition: all var(--transition);
+}
+.filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+.filter-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.filter-btn.status-ocupado.active  { background:#ef4444; border-color:#ef4444; color:white; }
+.filter-btn.status-disponivel.active { background:#10b981; border-color:#10b981; color:white; }
+.filter-btn.status-reservado.active { background:#8b5cf6; border-color:#8b5cf6; color:white; }
+.filter-btn.status-manutencao.active { background:#f59e0b; border-color:#f59e0b; color:white; }
+.toolbar-divider { width: 1px; height: 24px; background: var(--border); }
+.view-btns { display: flex; gap: 4px; }
+.view-btn {
+  width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  transition: all var(--transition);
+}
+.view-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.refresh-btn {
+  display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+  background: var(--primary); color: white; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition);
+  font-family: var(--font);
+}
+.refresh-btn:hover { background: var(--primary-dark); }
+.refresh-btn i { font-size: 13px; }
+
+/* ===== LEITOS GRID ===== */
+.leitos-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.leito-card {
+  background: var(--surface); border-radius: var(--radius); border: 1.5px solid var(--border);
+  padding: 0; overflow: hidden; box-shadow: var(--shadow-sm);
+  transition: all var(--transition); cursor: pointer; position: relative;
+}
+.leito-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.leito-card.status-Ocupado { border-top: 3px solid var(--red); }
+.leito-card.status-Disponivel { border-top: 3px solid var(--green); }
+.leito-card.status-Reservado { border-top: 3px solid var(--purple); }
+.leito-card.status-Manutencao { border-top: 3px solid var(--yellow); }
+.leito-card-header {
+  padding: 16px 16px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.leito-number { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.leito-tipo { font-size: 12px; color: var(--text-3); font-weight: 500; margin-top: 2px; }
+.leito-badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.leito-badge.Disponivel { background: var(--green-bg); color: var(--green); }
+.leito-badge.Ocupado { background: var(--red-bg); color: var(--red); }
+.leito-badge.Reservado { background: var(--purple-bg); color: var(--purple); }
+.leito-badge.Manutencao { background: var(--yellow-bg); color: var(--yellow); }
+.leito-badge .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.leito-paciente {
+  padding: 10px 16px 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.paciente-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+}
+.paciente-info { min-width: 0; }
+.paciente-nome { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.paciente-diag { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.leito-monitor { padding: 12px 16px; }
+.monitor-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.bpm-display { display: flex; align-items: center; gap: 8px; }
+.heart-icon {
+  font-size: 16px; color: var(--red);
+  animation: heartbeat 1s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%,100%{transform:scale(1)} 14%{transform:scale(1.25)} 28%{transform:scale(1)} 42%{transform:scale(1.15)} 56%{transform:scale(1)}
+}
+.heart-icon.normal { color: var(--green); animation-duration: 0.9s; }
+.heart-icon.warning { color: var(--yellow); animation-duration: 0.7s; }
+.heart-icon.critical { color: var(--red); animation-duration: 0.5s; }
+.bpm-value { font-size: 20px; font-weight: 700; font-family: var(--mono); color: var(--text); }
+.bpm-unit { font-size: 11px; color: var(--text-3); font-weight: 500; }
+.spo2-row { display: flex; align-items: center; gap: 4px; }
+.spo2-label { font-size: 11px; color: var(--text-3); }
+.spo2-value { font-size: 13px; font-weight: 700; color: var(--primary); font-family: var(--mono); }
+.ecg-container { position: relative; height: 42px; overflow: hidden; }
+.ecg-canvas { width: 100%; height: 42px; display: block; }
+.leito-equips {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.equip-badge {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500;
+  background: var(--surface2); color: var(--text-2);
+}
+.equip-badge .equip-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+}
+.equip-dot.online { background: var(--green); }
+.equip-dot.offline { background: var(--text-3); }
+.leito-actions {
+  padding: 10px 16px;
+  display: flex; gap: 6px;
+  border-top: 1px solid var(--border-light);
+}
+.action-btn {
+  flex: 1; padding: 7px; border-radius: 7px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--surface);
+  color: var(--text-2); cursor: pointer; transition: all var(--transition); font-family: var(--font);
+}
+.action-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.action-btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+.action-btn.primary:hover { background: var(--primary-dark); }
+
+/* ===== SKELETON LOADING ===== */
+.skeleton { animation: skeleton-pulse 1.5s ease-in-out infinite; }
+@keyframes skeleton-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.skeleton-card {
+  background: var(--surface); border-radius: var(--radius); padding: 20px;
+  border: 1.5px solid var(--border); height: 220px;
+}
+.skeleton-line { background: var(--border); border-radius: 4px; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px); z-index: 200; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal {
+  background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 560px;
+  box-shadow: var(--shadow-lg); animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1);
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-header {
+  padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--surface); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; color: var(--text-3); font-size: 14px; transition: all var(--transition);
+}
+.modal-close:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.modal-body { padding: 24px 28px; }
+.modal-section { margin-bottom: 20px; }
+.modal-section-title {
+  font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 10px;
+}
+.modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.form-input, .form-select {
+  padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: var(--font); color: var(--text); background: var(--surface);
+  outline: none; transition: border-color var(--transition);
+}
+.form-input:focus, .form-select:focus { border-color: var(--primary); }
+.modal-footer {
+  padding: 16px 28px 24px;
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.btn {
+  padding: 10px 20px; border-radius: 9px; font-size: 14px; font-weight: 600;
+  border: none; cursor: pointer; transition: all var(--transition); font-family: var(--font);
+}
+.btn-secondary { background: var(--surface); color: var(--text-2); border: 1.5px solid var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-danger { background: var(--red); color: white; }
+.btn-danger:hover { opacity: 0.85; }
+
+/* ===== HISTORY LIST ===== */
+.history-list { display: flex; flex-direction: column; gap: 6px; }
+.history-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: var(--surface2); border-radius: 8px;
+  font-size: 13px; color: var(--text-2);
+}
+.history-item i { color: var(--primary); font-size: 12px; }
+
+/* ===== TOAST ===== */
+.toast-container {
+  position: fixed; bottom: 28px; right: 28px; z-index: 300;
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--text); color: white; padding: 14px 18px;
+  border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  font-size: 14px; font-weight: 500; pointer-events: all;
+  animation: toastIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  max-width: 340px; min-width: 240px;
+}
+@keyframes toastIn { from{transform:translateX(120%);opacity:0} to{transform:translateX(0);opacity:1} }
+.toast.out { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut { to{transform:translateX(120%);opacity:0} }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast.success .toast-icon { color: var(--green); }
+.toast.error .toast-icon { color: var(--red); }
+.toast.info .toast-icon { color: #60a5fa; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  grid-column: 1/-1; display: flex; flex-direction: column; align-items: center;
+  padding: 60px 20px; color: var(--text-3); text-align: center;
+}
+.empty-state i { font-size: 40px; margin-bottom: 12px; color: var(--border); }
+.empty-state p { font-size: 15px; }
+
+/* ===== PAGES ===== */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 16px; }
+  .leitos-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-search { flex: auto; }
+  .modal-form-row { grid-template-columns: 1fr; }
+}
+
+/* ===== VITALS INLINE ===== */
+.leito-no-monitor {
+  padding: 18px 16px; text-align: center; color: var(--text-3); font-size: 13px;
+}
+.leito-no-monitor i { font-size: 24px; margin-bottom: 6px; display: block; color: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#">
+    <div class="brand-icon"><i class="fas fa-heartbeat"></i></div>
+    <span class="brand-name">Medi<span>Cloud</span></span>
+  </a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
+    <button class="nav-link" onclick="showPage('leitos')"><i class="fas fa-bed"></i> Leitos</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-badge"><span class="dot"></span> Redis Online</div>
+    <span class="nav-time" id="clock">--:--:--</span>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <button class="sidebar-link active" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i> Visão Geral</button>
+  <button class="sidebar-link" onclick="showPage('leitos')"><i class="fas fa-bed"></i> Gerenciar Leitos</button>
+  <div class="sidebar-section"><span class="sidebar-label">Filtros rápidos</span></div>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros(null,'Ocupado')"><i class="fas fa-circle" style="color:var(--red);font-size:8px"></i> Ocupados <span class="sidebar-count red" id="sb-ocupados">—</span></button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros(null,'Disponivel')"><i class="fas fa-circle" style="color:var(--green);font-size:8px"></i> Disponíveis <span class="sidebar-count green" id="sb-disp">—</span></button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros(null,'Reservado')"><i class="fas fa-circle" style="color:var(--purple);font-size:8px"></i> Reservados <span class="sidebar-count" id="sb-res">—</span></button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros(null,'Manutencao')"><i class="fas fa-circle" style="color:var(--yellow);font-size:8px"></i> Manutenção <span class="sidebar-count" id="sb-man">—</span></button>
+  <div class="sidebar-section"><span class="sidebar-label">Categorias</span></div>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros('UTI',null)"><i class="fas fa-procedures"></i> UTI</button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros('Enfermaria',null)"><i class="fas fa-hospital-user"></i> Enfermaria</button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros('Emergencia',null)"><i class="fas fa-ambulance"></i> Emergência</button>
+  <button class="sidebar-link" onclick="showPage('leitos');setFiltros('Pediatria',null)"><i class="fas fa-child"></i> Pediatria</button>
+</aside>
+
+<div class="layout">
+<main class="main">
+
+<!-- PAGE: DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">Visão geral do hospital em tempo real</div>
+  </div>
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card skeleton"><div class="skeleton-line" style="height:40px;width:60%;margin-bottom:14px"></div><div class="skeleton-line" style="height:30px;width:40%"></div></div>
+    <div class="stat-card skeleton"><div class="skeleton-line" style="height:40px;width:60%;margin-bottom:14px"></div><div class="skeleton-line" style="height:30px;width:40%"></div></div>
+    <div class="stat-card skeleton"><div class="skeleton-line" style="height:40px;width:60%;margin-bottom:14px"></div><div class="skeleton-line" style="height:30px;width:40%"></div></div>
+    <div class="stat-card skeleton"><div class="skeleton-line" style="height:40px;width:60%;margin-bottom:14px"></div><div class="skeleton-line" style="height:30px;width:40%"></div></div>
+  </div>
+</div>
+
+<!-- PAGE: LEITOS -->
+<div class="page" id="page-leitos">
+  <div class="page-header">
+    <div class="page-title">Gerenciamento de Leitos</div>
+    <div class="page-subtitle">Monitoramento em tempo real de todos os leitos hospitalares</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Buscar leito ou paciente..." oninput="renderLeitos()"/>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="filter-group" id="tipo-filters">
+      <button class="filter-btn active" data-tipo="" onclick="setTipoFilter(this,'')">Todos</button>
+      <button class="filter-btn" data-tipo="UTI" onclick="setTipoFilter(this,'UTI')"><i class="fas fa-procedures"></i> UTI</button>
+      <button class="filter-btn" data-tipo="Enfermaria" onclick="setTipoFilter(this,'Enfermaria')"><i class="fas fa-hospital-user"></i> Enfermaria</button>
+      <button class="filter-btn" data-tipo="Emergencia" onclick="setTipoFilter(this,'Emergencia')"><i class="fas fa-ambulance"></i> Emergência</button>
+      <button class="filter-btn" data-tipo="Pediatria" onclick="setTipoFilter(this,'Pediatria')"><i class="fas fa-child"></i> Pediatria</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="filter-group" id="status-filters">
+      <button class="filter-btn active" data-status="" onclick="setStatusFilter(this,'')">Todos</button>
+      <button class="filter-btn status-disponivel" data-status="Disponivel" onclick="setStatusFilter(this,'Disponivel')">Disponível</button>
+      <button class="filter-btn status-ocupado" data-status="Ocupado" onclick="setStatusFilter(this,'Ocupado')">Ocupado</button>
+      <button class="filter-btn status-reservado" data-status="Reservado" onclick="setStatusFilter(this,'Reservado')">Reservado</button>
+      <button class="filter-btn status-manutencao" data-status="Manutencao" onclick="setStatusFilter(this,'Manutencao')">Manutenção</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <button class="refresh-btn" onclick="fetchLeitos()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+  </div>
+
+  <div class="leitos-grid" id="leitos-grid">
+    <!-- Skeletons iniciais -->
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MODAL DETALHE / EDIÇÃO -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Leito 101</div>
+      <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Status do Leito</div>
+        <div class="form-group">
+          <label class="form-label">Alterar status</label>
+          <select class="form-select" id="modal-status">
+            <option value="Disponivel">Disponível</option>
+            <option value="Ocupado">Ocupado</option>
+            <option value="Reservado">Reservado</option>
+            <option value="Manutencao">Manutenção</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-section" id="modal-paciente-section">
+        <div class="modal-section-title">Paciente</div>
+        <div class="modal-form-row">
+          <div class="form-group">
+            <label class="form-label">Nome do paciente</label>
+            <input class="form-input" id="modal-paciente" type="text" placeholder="Nome completo"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Idade</label>
+            <input class="form-input" id="modal-idade" type="number" placeholder="Ex: 45"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Diagnóstico</label>
+          <input class="form-input" id="modal-diag" type="text" placeholder="Diagnóstico ou observação"/>
+        </div>
+      </div>
+      <div class="modal-section" id="modal-historico-section">
+        <div class="modal-section-title">Histórico de status</div>
+        <div class="history-list" id="modal-historico"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="btn-liberar" onclick="liberarLeito()" style="display:none">
+        <i class="fas fa-user-minus"></i> Liberar leito
+      </button>
+      <button class="btn btn-secondary" onclick="closeModalDirect()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarModal()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ===== STATE =====
+let allLeitos = [];
+let filtroTipo = '';
+let filtroStatus = '';
+let currentLeitoId = null;
+let ecgAnimations = {};
+
+// ===== CLOCK =====
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR');
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link, .sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll(`.nav-link, .sidebar-link`).forEach(l => {
+    if (l.textContent.trim().toLowerCase().includes(name === 'dashboard' ? 'visão' : 'gerenciar')) l.classList.add('active');
+    if (name === 'dashboard' && l.textContent.trim().toLowerCase().includes('dashboard')) l.classList.add('active');
+  });
+  if (name === 'leitos') fetchLeitos();
+  if (name === 'dashboard') fetchStats();
+}
+
+// ===== FILTERS =====
+function setTipoFilter(btn, tipo) {
+  filtroTipo = tipo;
+  document.querySelectorAll('#tipo-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeitos();
+}
+function setStatusFilter(btn, status) {
+  filtroStatus = status;
+  document.querySelectorAll('#status-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeitos();
+}
+function setFiltros(tipo, status) {
+  if (tipo !== null) {
+    filtroTipo = tipo;
+    document.querySelectorAll('#tipo-filters .filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.tipo === tipo);
+    });
+  }
+  if (status !== null) {
+    filtroStatus = status;
+    document.querySelectorAll('#status-filters .filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.status === status);
+    });
+  }
+  renderLeitos();
+}
+
+// ===== API =====
+async function fetchLeitos() {
+  try {
+    const res = await fetch('/leitos/');
+    if (!res.ok) throw new Error('Erro ao buscar leitos');
+    allLeitos = await res.json();
+    renderLeitos();
+    updateSidebarCounts();
+  } catch (e) {
+    showToast('Erro ao conectar com a API', 'error');
+  }
+}
+
+async function fetchStats() {
+  try {
+    const res = await fetch('/leitos/stats');
+    const s = await res.json();
+    renderStats(s);
+    updateSidebarCounts(s);
+  } catch (e) {
+    showToast('Erro ao carregar estatísticas', 'error');
+  }
+}
+
+function updateSidebarCounts(s) {
+  if (!s) {
+    const cnt = (st) => allLeitos.filter(l => l.status === st).length;
+    document.getElementById('sb-ocupados').textContent = cnt('Ocupado');
+    document.getElementById('sb-disp').textContent = cnt('Disponivel');
+    document.getElementById('sb-res').textContent = cnt('Reservado');
+    document.getElementById('sb-man').textContent = cnt('Manutencao');
+  } else {
+    document.getElementById('sb-ocupados').textContent = s.ocupados;
+    document.getElementById('sb-disp').textContent = s.disponiveis;
+    document.getElementById('sb-res').textContent = s.reservados;
+    document.getElementById('sb-man').textContent = s.manutencao;
+  }
+}
+
+// ===== RENDER STATS =====
+function renderStats(s) {
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon blue"><i class="fas fa-bed"></i></div>
+        <span class="stat-trend up">${s.taxa_ocupacao}%</span>
+      </div>
+      <div class="stat-value">${s.total}</div>
+      <div class="stat-label">Total de Leitos</div>
+      <div class="stat-bar"><div class="stat-bar-fill blue" style="width:100%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon red"><i class="fas fa-user-injured"></i></div>
+        <span class="stat-trend ${s.ocupados > s.total*0.7 ? 'down' : 'up'}">${Math.round(s.ocupados/s.total*100)||0}%</span>
+      </div>
+      <div class="stat-value">${s.ocupados}</div>
+      <div class="stat-label">Ocupados</div>
+      <div class="stat-bar"><div class="stat-bar-fill red" style="width:${s.ocupados/s.total*100||0}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+        <span class="stat-trend up">${Math.round(s.disponiveis/s.total*100)||0}%</span>
+      </div>
+      <div class="stat-value">${s.disponiveis}</div>
+      <div class="stat-label">Disponíveis</div>
+      <div class="stat-bar"><div class="stat-bar-fill green" style="width:${s.disponiveis/s.total*100||0}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon yellow"><i class="fas fa-tools"></i></div>
+      </div>
+      <div class="stat-value">${s.manutencao + s.reservados}</div>
+      <div class="stat-label">Reservados / Manutenção</div>
+      <div class="stat-bar"><div class="stat-bar-fill yellow" style="width:${(s.manutencao+s.reservados)/s.total*100||0}%"></div></div>
+    </div>
+  `;
+}
+
+// ===== RENDER LEITOS =====
+function renderLeitos() {
+  const grid = document.getElementById('leitos-grid');
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+
+  let filtered = allLeitos.filter(l => {
+    const matchTipo = !filtroTipo || l.tipo === filtroTipo;
+    const matchStatus = !filtroStatus || l.status === filtroStatus;
+    const matchSearch = !search || l.id.includes(search) || (l.paciente || '').toLowerCase().includes(search);
+    return matchTipo && matchStatus && matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum leito encontrado com os filtros selecionados.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(l => buildCard(l)).join('');
+
+  // Inicia ECG para ocupados
+  filtered.forEach(l => {
+    if (l.status === 'Ocupado') {
+      const canvas = document.getElementById(`ecg-${l.id}`);
+      if (canvas) startECG(canvas, l.id);
+    }
+  });
+
+  // BPM dinâmico
+  filtered.forEach(l => {
+    if (l.status === 'Ocupado') startBPMUpdate(l.id);
+  });
+}
+
+// ===== BUILD CARD =====
+const bpmData = {};
+const equipDB = {
+  UTI:       ['Monitor','Respirador','O₂','Bomba Inf.'],
+  Enfermaria:['Monitor','O₂','Soro'],
+  Emergencia:['Monitor','Desfibrilador','O₂'],
+  Pediatria: ['Monitor','O₂','Soro'],
+};
+
+function getBPM(id) {
+  if (!bpmData[id]) {
+    const base = [60, 75, 85, 95][Math.floor(Math.random()*4)];
+    bpmData[id] = { base, current: base + Math.floor(Math.random()*10 - 5) };
+  }
+  return bpmData[id].current;
+}
+
+function buildCard(l) {
+  const isOcupado = l.status === 'Ocupado';
+  const initials = l.paciente ? l.paciente.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '';
+  const bpm = getBPM(l.id);
+  const heartClass = bpm < 60 ? 'warning' : bpm > 100 ? 'critical' : 'normal';
+  const spo2 = 93 + Math.floor(Math.random()*6);
+  const equips = equipDB[l.tipo] || ['Monitor','O₂'];
+  const equipHtml = equips.map((e, i) =>
+    `<span class="equip-badge"><span class="equip-dot ${isOcupado && i < equips.length-1 ? 'online':'offline'}"></span>${e}</span>`
+  ).join('');
+
+  return `
+  <div class="leito-card status-${l.status}" onclick="openModal('${l.id}')">
+    <div class="leito-card-header">
+      <div>
+        <div class="leito-number">Leito ${l.id}</div>
+        <div class="leito-tipo">${l.tipo}</div>
+      </div>
+      <div class="leito-badge ${l.status}">
+        <span class="badge-dot"></span>
+        ${l.status === 'Disponivel' ? 'Disponível' : l.status === 'Manutencao' ? 'Manutenção' : l.status}
+      </div>
+    </div>
+    ${isOcupado && l.paciente ? `
+    <div class="leito-paciente">
+      <div class="paciente-avatar">${initials}</div>
+      <div class="paciente-info">
+        <div class="paciente-nome">${l.paciente}</div>
+        <div class="paciente-diag">${l.paciente_diagnostico || l.paciente_idade ? (l.paciente_diagnostico || '') + (l.paciente_idade ? ' · '+l.paciente_idade+' anos' : '') : 'Sem diagnóstico'}</div>
+      </div>
+    </div>` : !isOcupado ? '' : `
+    <div class="leito-paciente">
+      <div class="paciente-avatar" style="background:var(--red-bg);color:var(--red)"><i class="fas fa-user"></i></div>
+      <div class="paciente-info">
+        <div class="paciente-nome">Paciente não identificado</div>
+        <div class="paciente-diag">Clique para adicionar dados</div>
+      </div>
+    </div>`}
+    ${isOcupado ? `
+    <div class="leito-monitor">
+      <div class="monitor-row">
+        <div class="bpm-display">
+          <i class="fas fa-heart heart-icon ${heartClass}"></i>
+          <span class="bpm-value" id="bpm-${l.id}">${bpm}</span>
+          <span class="bpm-unit">BPM</span>
+        </div>
+        <div class="spo2-row">
+          <span class="spo2-label">SpO₂&nbsp;</span>
+          <span class="spo2-value" id="spo2-${l.id}">${spo2}%</span>
+        </div>
+      </div>
+      <div class="ecg-container">
+        <canvas class="ecg-canvas" id="ecg-${l.id}" height="42"></canvas>
+      </div>
+    </div>` : `
+    <div class="leito-no-monitor">
+      <i class="fas fa-heartbeat"></i>
+      <span>Sem monitoramento ativo</span>
+    </div>`}
+    <div class="leito-equips">${equipHtml}</div>
+    <div class="leito-actions">
+      <button class="action-btn" onclick="event.stopPropagation();openModal('${l.id}')">
+        <i class="fas fa-edit"></i> Editar
+      </button>
+      ${!isOcupado ? `<button class="action-btn primary" onclick="event.stopPropagation();quickAdmit('${l.id}')">
+        <i class="fas fa-user-plus"></i> Admitir
+      </button>` : `<button class="action-btn" style="border-color:var(--red);color:var(--red)" onclick="event.stopPropagation();quickDischarge('${l.id}')">
+        <i class="fas fa-user-minus"></i> Alta
+      </button>`}
+    </div>
+  </div>`;
+}
+
+// ===== ECG ANIMATION =====
+function startECG(canvas, id) {
+  if (ecgAnimations[id]) cancelAnimationFrame(ecgAnimations[id]);
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 248;
+  const W = canvas.width, H = 42;
+  let x = 0, phase = 0;
+
+  function ecgPoint(px) {
+    const cycle = px % 80;
+    if (cycle < 10) return H/2 + Math.sin(cycle/10*Math.PI)*3;
+    if (cycle === 15) return H/2 - 18;
+    if (cycle === 17) return H/2 + 8;
+    if (cycle === 19) return H/2 - 22;
+    if (cycle === 21) return H/2 + 5;
+    if (cycle > 21 && cycle < 30) return H/2 + Math.sin((cycle-21)/9*Math.PI)*5;
+    return H/2 + Math.sin(cycle/80*Math.PI)*1.5;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = '#10b981';
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    for (let i = 0; i < W; i++) {
+      const y = ecgPoint(i + phase);
+      i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y);
+    }
+    ctx.stroke();
+    // Dot
+    const dotX = (phase * 0.8) % W;
+    ctx.beginPath();
+    ctx.arc(dotX, ecgPoint(dotX + phase), 3, 0, Math.PI*2);
+    ctx.fillStyle = '#10b981';
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    phase += 1.2;
+    ecgAnimations[id] = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ===== BPM UPDATE =====
+const bpmIntervals = {};
+function startBPMUpdate(id) {
+  if (bpmIntervals[id]) clearInterval(bpmIntervals[id]);
+  bpmIntervals[id] = setInterval(() => {
+    if (!bpmData[id]) return;
+    const delta = Math.floor(Math.random()*7 - 3);
+    bpmData[id].current = Math.max(45, Math.min(130, bpmData[id].current + delta));
+    const el = document.getElementById(`bpm-${id}`);
+    if (el) el.textContent = bpmData[id].current;
+    // SpO2
+    const spo2El = document.getElementById(`spo2-${id}`);
+    if (spo2El) {
+      const v = 93 + Math.floor(Math.random()*6);
+      spo2El.textContent = v + '%';
+    }
+  }, 1800);
+}
+
+// ===== MODAL =====
+async function openModal(leitoId) {
+  currentLeitoId = leitoId;
+  const leito = allLeitos.find(l => l.id === leitoId);
+  if (!leito) return;
+
+  document.getElementById('modal-title').textContent = `Leito ${leitoId} — ${leito.tipo}`;
+  document.getElementById('modal-status').value = leito.status;
+  document.getElementById('modal-paciente').value = leito.paciente || '';
+  document.getElementById('modal-idade').value = leito.paciente_idade || '';
+  document.getElementById('modal-diag').value = leito.paciente_diagnostico || '';
+  document.getElementById('btn-liberar').style.display = leito.status === 'Ocupado' ? '' : 'none';
+
+  // Histórico
+  try {
+    const res = await fetch(`/leitos/${leitoId}/historico`);
+    const data = await res.json();
+    const hist = data.historico || [];
+    document.getElementById('modal-historico').innerHTML = hist.length
+      ? hist.reverse().map(h => `<div class="history-item"><i class="fas fa-clock"></i>${h}</div>`).join('')
+      : '<div class="history-item"><i class="fas fa-info-circle"></i>Sem histórico ainda</div>';
+  } catch {}
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentLeitoId = null;
+}
+
+async function salvarModal() {
+  if (!currentLeitoId) return;
+  const status = document.getElementById('modal-status').value;
+  const paciente = document.getElementById('modal-paciente').value.trim();
+  const idade = document.getElementById('modal-idade').value;
+  const diag = document.getElementById('modal-diag').value.trim();
+
+  try {
+    // Atualizar status
+    await fetch(`/leitos/${currentLeitoId}/status`, {
+      method: 'PATCH', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+
+    // Atualizar paciente se nome fornecido
+    if (paciente) {
+      await fetch(`/leitos/${currentLeitoId}/paciente`, {
+        method: 'PATCH', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ nome: paciente, idade: idade ? parseInt(idade) : null, diagnostico: diag || null })
+      });
+    }
+
+    closeModalDirect();
+    await fetchLeitos();
+    await fetchStats();
+    showToast('Leito atualizado com sucesso!', 'success');
+  } catch {
+    showToast('Erro ao salvar alterações', 'error');
+  }
+}
+
+async function liberarLeito() {
+  if (!currentLeitoId) return;
+  try {
+    await fetch(`/leitos/${currentLeitoId}/paciente`, { method: 'DELETE' });
+    closeModalDirect();
+    await fetchLeitos();
+    await fetchStats();
+    showToast('Leito liberado com sucesso!', 'success');
+  } catch {
+    showToast('Erro ao liberar leito', 'error');
+  }
+}
+
+// ===== QUICK ACTIONS =====
+async function quickAdmit(leitoId) {
+  currentLeitoId = leitoId;
+  const leito = allLeitos.find(l => l.id === leitoId);
+  if (!leito) return;
+  document.getElementById('modal-title').textContent = `Admitir Paciente — Leito ${leitoId}`;
+  document.getElementById('modal-status').value = 'Ocupado';
+  document.getElementById('modal-paciente').value = '';
+  document.getElementById('modal-idade').value = '';
+  document.getElementById('modal-diag').value = '';
+  document.getElementById('btn-liberar').style.display = 'none';
+  document.getElementById('modal-historico').innerHTML = '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function quickDischarge(leitoId) {
+  currentLeitoId = leitoId;
+  await liberarLeito();
+}
+
+// ===== TOAST =====
+function showToast(msg, type = 'info') {
+  const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i class="fas ${icons[type]} toast-icon"></i><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ===== INIT =====
+fetchStats();
+// Auto-refresh a cada 30s
+setInterval(() => {
+  const leitosPage = document.getElementById('page-leitos');
+  if (leitosPage.classList.contains('active')) fetchLeitos();
+  fetchStats();
+}, 30000);
+</script>
+</body>
+</html>
